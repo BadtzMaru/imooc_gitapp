@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import NavigationUtil from '../navigator/NavigationUtil';
 
 class WelcomePage extends Component {
   componentDidMount() {
     this.timer = setTimeout(() => {
       // 跳转到首页
+      NavigationUtil.resetToHomePage(this.props);
     }, 2000);
   }
   componentWillUnmount() {
@@ -14,7 +16,7 @@ class WelcomePage extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>WelcomePage</Text>
+        <Text style={styles.welcome}>WelcomePage</Text>
       </View>
     );
   }
@@ -25,6 +27,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
   },
 });
 
