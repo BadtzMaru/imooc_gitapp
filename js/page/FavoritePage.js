@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Button} from 'react-native';
+import {connect} from 'react-redux';
+import actions from '../action';
 
 class FavoritePage extends Component {
   render() {
@@ -9,14 +11,7 @@ class FavoritePage extends Component {
         <Text style={styles.welcome}>FavoritePage</Text>
         <Button
           title="修改主题"
-          onPress={() =>
-            navigation.setParams({
-              theme: {
-                tintColor: 'orange',
-                updateTime: new Date().getTime(),
-              },
-            })
-          }
+          onPress={() => this.props.onThemeChange('#021')}
         />
       </View>
     );
@@ -37,4 +32,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FavoritePage;
+const mapDispatchToProps = (dispatch) => ({
+  onThemeChange: (theme) => dispatch(actions.onThemeChange(theme)),
+});
+
+export default connect(null, mapDispatchToProps)(FavoritePage);
