@@ -5,6 +5,8 @@ import WelcomePage from '../page/WelcomePage';
 import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
 import FetchDemoPage from '../page/FetchDemoPage';
+import AsyncStorageDemoPage from '../page/AsyncStorageDemoPage';
+import DataStoreDemoPage from '../page/DataStoreDemoPage';
 
 const InitNavigator = createStackNavigator({
   WelcomePage: {
@@ -28,6 +30,12 @@ const MainNavigator = createStackNavigator({
   },
   FetchDemoPage: {
     screen: FetchDemoPage,
+  },
+  AsyncStorageDemoPage: {
+    screen: AsyncStorageDemoPage,
+  },
+  DataStoreDemoPage: {
+    screen: DataStoreDemoPage,
   },
 });
 

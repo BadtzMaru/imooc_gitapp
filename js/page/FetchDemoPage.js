@@ -19,6 +19,26 @@ export default class FetchDemoPage extends Component {
         });
       });
   }
+  loadData2() {
+    let url = `https://api.github.com/search/repositories?q=${this.searchKey}`;
+    fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response.text();
+        }
+        throw new Error('Network response was not ok!');
+      })
+      .then((responseText) => {
+        this.setState({
+          showText: responseText,
+        });
+      })
+      .catch((e) => {
+        this.setState({
+          showText: e.toString(),
+        });
+      });
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -38,7 +58,6 @@ export default class FetchDemoPage extends Component {
             }}
           />
         </View>
-
         <Text>{this.state.showText}</Text>
       </View>
     );
