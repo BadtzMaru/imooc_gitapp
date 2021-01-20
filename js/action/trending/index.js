@@ -3,18 +3,18 @@ import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore';
 import {handleData} from '../ActionUtil';
 
 // 获取最热数据action
-export function onRefreshPopular(storeName, url, pageSize) {
+export function onRefreshTrending(storeName, url, pageSize) {
   return (dispatch) => {
     dispatch({
-      type: Types.POPULAR_REFRESH,
+      type: Types.TRENDING_REFRESH,
       storeName,
     });
     let dataStore = new DataStore();
     dataStore
-      .fetchData(url, FLAG_STORAGE.flag_popular)
+      .fetchData(url, FLAG_STORAGE.flag_trending)
       .then((data) => {
         handleData(
-          Types.POPULAR_REFRESH_SUCCESS,
+          Types.TRENDING_REFRESH_SUCCESS,
           dispatch,
           storeName,
           data,
@@ -32,7 +32,7 @@ export function onRefreshPopular(storeName, url, pageSize) {
   };
 }
 
-export function onLoadMorePopular(
+export function onLoadMoreTrending(
   storeName,
   pageIndex,
   pageSize,
@@ -46,7 +46,7 @@ export function onLoadMorePopular(
           callback('no more');
         }
         dispatch({
-          type: Types.POPULAR_LOAD_MORE_FAIL,
+          type: Types.TRENDING_LOAD_MORE_FAIL,
           error: 'no more',
           storeName,
           pageIndex: --pageIndex,
@@ -58,7 +58,7 @@ export function onLoadMorePopular(
             ? dataArray.length
             : pageSize * pageIndex;
         dispatch({
-          type: Types.POPULAR_LOAD_MORE_SUCCESS,
+          type: Types.TRENDING_LOAD_MORE_SUCCESS,
           storeName,
           pageIndex,
           projectModes: dataArray.slice(0, max),

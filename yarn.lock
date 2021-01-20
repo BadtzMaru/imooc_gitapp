@@ -1371,6 +1371,11 @@
   dependencies:
     eslint-visitor-keys "^1.1.0"
 
+GitHubTrending@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npm.taobao.org/GitHubTrending/download/GitHubTrending-5.0.0.tgz#d272acf5b134dc0dab24a8877577223462054809"
+  integrity sha1-0nKs9bE03A2rJKiHdXciNGIFSAk=
+
 abab@^2.0.3:
   version "2.0.5"
   resolved "https://registry.npm.taobao.org/abab/download/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"

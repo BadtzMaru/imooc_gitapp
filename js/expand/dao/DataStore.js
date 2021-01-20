@@ -1,5 +1,13 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import {call} from 'react-native-reanimated';
+import Trending from 'GitHubTrending';
+
+export const FLAG_STORAGE = {
+  flag_popular: 'popular',
+  flag_trending: 'trending',
+};
+
+const AUTH_TOKEN = '0d5d00fdd11b90c9f26337437b7f7280e3cdb2f7';
 
 export default class DataStore {
   saveData(url, data, callback) {
@@ -27,33 +35,48 @@ export default class DataStore {
       });
     });
   }
-  fetchNetData(url) {
+  fetchNetData(url, flag) {
     return new Promise((resolve, reject) => {
-      fetch(url)
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Network response was not ok.');
-          }
-        })
-        .then((responseData) => {
-          this.saveData(url, responseData);
-          resolve(responseData);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      if (flag !== FLAG_STORAGE.flag_trending) {
+        fetch(url)
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Network response was not ok.');
+            }
+          })
+          .then((responseData) => {
+            this.saveData(url, responseData);
+            resolve(responseData);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        new Trending(AUTH_TOKEN)
+          .fetchTrending(url)
+          .then((items) => {
+            if (!items) {
+              throw new Error('responseData is null');
+            }
+            this.saveData(url, items);
+            resolve(items);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      }
     });
   }
-  fetchData(url) {
+  fetchData(url, flag) {
     return new Promise((resolve, reject) => {
       this.fetchLocalData(url)
         .then((wrapData) => {
           if (wrapData && DataStore.checkTimestampValid(wrapData.timestamp)) {
             resolve(wrapData);
           } else {
-            this.fetchNetData(url)
+            this.fetchNetData(url, flag)
               .then((data) => {
                 resolve(this._wrapData(data));
               })
@@ -63,7 +86,7 @@ export default class DataStore {
           }
         })
         .catch((error) => {
-          this.fetchNetData(url)
+          this.fetchNetData(url, flag)
             .then((data) => {
               resolve(this._wrapData(data));
             })
