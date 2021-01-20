@@ -7,7 +7,7 @@ export const FLAG_STORAGE = {
   flag_trending: 'trending',
 };
 
-const AUTH_TOKEN = '0d5d00fdd11b90c9f26337437b7f7280e3cdb2f7';
+const AUTH_TOKEN = 'fd82d1e882462e23b8e88aa82198f166';
 
 export default class DataStore {
   saveData(url, data, callback) {
