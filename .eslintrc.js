@@ -8,6 +8,7 @@ module.exports = {
 		'no-shadow': 0,
 		'react-native/no-inline-styles': 0,
 		'no-mixed-spaces-and-tabs': 0,
+		'react/no-did-mount-set-state': 0,
 		curly: 0,
 	},
 };

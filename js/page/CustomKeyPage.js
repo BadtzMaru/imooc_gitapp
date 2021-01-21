@@ -1,26 +1,15 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import actions from '../action/index';
-import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
-import { createAppContainer } from 'react-navigation';
-import NavigationUtil from '../navigator/NavigationUtil';
-import PopularItem from '../common/PopularItem';
-import Toast from 'react-native-easy-toast';
 import NavigationBar from '../common/NavigationBar';
-import FavoriteDao from '../expand/dao/FavoriteDao';
-import { FLAG_STORAGE } from '../expand/dao/DataStore';
-import FavoriteUtil from '../util/FavoriteUtil';
-import EventBus from 'react-native-event-bus';
-import EventTypes from '../util/EventTypes';
 import LanguageDao, { FLAG_LANGUAGE } from '../expand/dao/LanguageDao';
 import BackPressComponent from '../common/BackPressComponent';
-import action from '../action/index';
+import ViewUtil from '../util/ViewUtil';
+import CheckBox from 'react-native-check-box';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const URL = 'https://api.github.com/search/repositories?q=';
-const QUERY_STR = '&sort=stars';
 const TITLE_COLOR = '#678';
-const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
 class CustomKeyPage extends Component {
 	constructor(props) {
@@ -33,7 +22,6 @@ class CustomKeyPage extends Component {
 		this.state = {
 			keys: [],
 		};
-		this.setState({ keys: CustomKeyPage._keys(this.props) });
 	}
 	componentDidMount() {
 		this.backPress.componentDidMount();
@@ -42,6 +30,7 @@ class CustomKeyPage extends Component {
 			let { onLoadLanguage } = this.props;
 			onLoadLanguage(this.params.flag);
 		}
+		this.setState({ keys: CustomKeyPage._keys(this.props) });
 	}
 	componentWillUnmount() {
 		this.backPress.componentWillUnmount();
@@ -49,7 +38,7 @@ class CustomKeyPage extends Component {
 	static _keys(props, original, state) {
 		const { flag, isRemoveKey } = props.navigation.state.params;
 		let key = flag === FLAG_LANGUAGE.flag_key ? 'keys' : 'languages';
-		if (isRemoveKey && original) {
+		if (isRemoveKey && !original) {
 		} else {
 			return props.language[key];
 		}
@@ -59,17 +48,58 @@ class CustomKeyPage extends Component {
 		return true;
 	}
 	onBack() {}
-
+	onSave() {}
+	renderView() {
+		let dataArray = this.state.keys;
+		if (!dataArray || dataArray.length === 0) return null;
+		let len = dataArray.length;
+		let views = [];
+		for (let i = 0, l = len; i < l; i += 2) {
+			views.push(
+				<View key={i}>
+					<View style={styles.item}>
+						{this.renderCheckoBox(dataArray[i], i)}
+						{i + 1 < len && this.renderCheckoBox(dataArray[i + 1], i + 1)}
+						<View style={styles.line} />
+					</View>
+				</View>
+			);
+		}
+	}
+	onClick(data, index) {}
+	_checkedImage(checked) {
+		return <Ionicons name={checked ? 'ios-checkbox' : 'md-square-outline'} size={20} style={{ color: TITLE_COLOR }} />;
+	}
+	renderCheckoBox(data, index) {
+		return (
+			<CheckBox
+				style={{ flex: 1, padding: 10 }}
+				onClick={() => this.onClick(data, index)}
+				isChecked={data.isChecked}
+				leftText={data.name}
+				checkedImage={this._checkedImage(true)}
+				unCheckedImage={this._checkedImage(false)}
+			/>
+		);
+	}
 	render() {
 		let title = this.isRemoveKey ? '移出标签' : '自定义标签';
 		title = this.params.flag === FLAG_LANGUAGE.flag_language ? '自定义语言' : title;
+		let rightButtonTitle = this.isRemoveKey ? '移除' : '保存';
 		let navigationBar = (
 			<NavigationBar
 				title={title}
 				style={{
 					backgroundColor: TITLE_COLOR,
 				}}
+				rightButton={ViewUtil.getRightButton(rightButtonTitle, () => this.onSave())}
 			/>
+		);
+		return (
+			<View style={styles.container}>
+				{navigationBar}
+				<ScrollView>{this.renderView()}</ScrollView>
+			</View>
 		);
 	}
 }
@@ -80,3 +110,15 @@ const mapPopularDispatchToProps = (dispatch) => ({
 	onLoadLanguage: (flag) => dispatch(actions.onLoadLanguage(flag)),
 });
 export default connect(mapPopularStateToProps, mapPopularDispatchToProps)(CustomKeyPage);
+
+const styles = StyleSheet.create({
+	container: { flex: 1 },
+	item: {
+		flexDirection: 'row',
+	},
+	line: {
+		flex: 1,
+		height: 0.3,
+		backgroundColor: 'gray',
+	},
+});
