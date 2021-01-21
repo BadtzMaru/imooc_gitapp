@@ -10,7 +10,7 @@ export default class BaseItem extends Component {
 		onFavorite: PropTypes.func,
 	};
 	constructor(props) {
-    super(props);
+		super(props);
 		this.state = {
 			isFavorite: this.props.projectModel.isFavorite,
 		};
@@ -38,5 +38,10 @@ export default class BaseItem extends Component {
 				<FontAwesome name={this.state.isFavorite ? 'star' : 'star-o'} size={26} style={{ color: '#678' }} />
 			</TouchableOpacity>
 		);
+	}
+	onItemClick() {
+		this.props.onSelect((isFavorite) => {
+			this.setFavoriteState(isFavorite);
+		});
 	}
 }

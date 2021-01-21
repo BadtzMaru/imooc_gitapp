@@ -6,6 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { WebView } from 'react-native-webview';
 import NavigationUtil from '../navigator/NavigationUtil';
 import BackPressComponent from '../common/BackPressComponent';
+import FavoriteDao from '../expand/dao/FavoriteDao';
 
 const TRENDING_URL = 'https://github.com/';
 const THEME_COLOR = '#678';
@@ -14,15 +15,16 @@ class DetailPage extends Component {
 	constructor(props) {
 		super(props);
 		this.params = this.props.navigation.state.params;
-		let { projectModel } = this.params;
+		let { projectModel, flag } = this.params;
 		projectModel = projectModel.item;
+		this.favoriteDao = new FavoriteDao(flag);
 		this.url = projectModel.html_url || TRENDING_URL + projectModel.fullName;
-		console.log(projectModel);
 		const title = projectModel.full_name || projectModel.fullName;
 		this.state = {
 			title,
 			url: this.url,
 			canGoBack: false,
+			isFavorite: this.params.projectModel.isFavorite,
 		};
 		this.backPress = new BackPressComponent({ backPress: () => this.onBackPress() });
 	}
@@ -43,11 +45,23 @@ class DetailPage extends Component {
 			NavigationUtil.goBack(this.props.navigation);
 		}
 	}
+	onFavoriteButtonClick() {
+		let { projectModel, callback } = this.params;
+		const isFavorite = (projectModel.isFavorite = !projectModel.isFavorite);
+		callback(isFavorite);
+		this.setState({ isFavorite });
+		let key = projectModel.item.fullName ? projectModel.item.fullName : projectModel.item.id.toString();
+		if (projectModel.isFavorite) {
+			this.favoriteDao.saveFavoriteItem(key, JSON.stringify(projectModel));
+		} else {
+			this.favoriteDao.removeFavoriteItem(key);
+		}
+	}
 	renderRightButton() {
 		return (
 			<View style={{ flexDirection: 'row' }}>
-				<TouchableOpacity onPress={() => {}}>
-					<FontAwesome name='star-o' size={20} style={{ color: 'white', marginRight: 10 }} />
+				<TouchableOpacity onPress={() => this.onFavoriteButtonClick()}>
+					<FontAwesome name={this.state.isFavorite ? 'star' : 'star-o'} size={20} style={{ color: 'white', marginRight: 10 }} />
 				</TouchableOpacity>
 				{ViewUtil.getShareButton(() => {})}
 			</View>

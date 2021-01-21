@@ -12,7 +12,7 @@ class TrendingItem extends BaseItem {
 
 		let description = '<p>' + item.description + '</p>';
 		return (
-			<TouchableOpacity onPress={this.props.onSelect}>
+			<TouchableOpacity onPress={() => this.onItemClick()}>
 				<View style={styles.cell_container}>
 					<Text style={styles.title}>{item.fullName}</Text>
 					<HTMLView value={description} onLinkPress={(url) => {}} stylesheet={{ p: styles.description, a: styles.description }} />

@@ -16,7 +16,6 @@ export function onRefreshTrending(storeName, url, pageSize, favoriteDao) {
 				handleData(Types.TRENDING_REFRESH_SUCCESS, dispatch, storeName, data, pageSize, favoriteDao);
 			})
 			.catch((error) => {
-				console.log(error.toString());
 				dispatch({
 					type: Types.LOAD_POPULAR_FAIL,
 					storeName,

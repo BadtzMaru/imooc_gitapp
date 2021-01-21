@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Button, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { connect } from 'react-redux';
 import actions from '../action/index';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
@@ -14,7 +14,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FavoriteDao from '../expand/dao/FavoriteDao';
 import { FLAG_STORAGE } from '../expand/dao/DataStore';
 import FavoriteUtil from '../util/FavoriteUtil';
-const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 
 const URL = 'https://github.com/trending/';
 const TITLE_COLOR = '#678';
@@ -47,7 +47,7 @@ class TrendingPage extends Component {
 				<TouchableOpacity ref='button' onPress={() => this.dialog.show()}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<Text style={{ fontSize: 18, color: '#FFF', fontWeight: '400' }}>趋势 {this.state.timeSpan.showText}</Text>
-						<MaterialIcons name='arrow-drop-down' style={22} style={{ color: 'white' }} />
+						<MaterialIcons name='arrow-drop-down' size={22} style={{ color: 'white' }} />
 					</View>
 				</TouchableOpacity>
 			</View>
@@ -121,7 +121,9 @@ class TrendingTab extends Component {
 		});
 	}
 	componentWillUnmount() {
-		if (this.timeSpanChangeListener) this.timeSpanChangeListener.remove();
+		if (this.timeSpanChangeListener) {
+			this.timeSpanChangeListener.remove();
+		}
 	}
 	_store() {
 		const { trending } = this.props;
@@ -156,15 +158,17 @@ class TrendingTab extends Component {
 		return (
 			<TrendingItem
 				projectModel={item}
-				onSelect={() => {
+				onSelect={(callback) => {
 					NavigationUtil.goPage(
 						{
 							projectModel: item,
+							flag: FLAG_STORAGE.flag_trending,
+							callback,
 						},
 						'DetailPage'
 					);
 				}}
-				onFavorite={(item, isFavorite) => FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, FLAG_STORAGE.flag_popular)}
+				onFavorite={(item, isFavorite) => FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, FLAG_STORAGE.flag_trending)}
 			/>
 		);
 	}

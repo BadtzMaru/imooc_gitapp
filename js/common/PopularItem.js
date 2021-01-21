@@ -10,7 +10,7 @@ class PopularItem extends BaseItem {
 		if (!item || !item.owner) return null;
 
 		return (
-			<TouchableOpacity onPress={this.props.onSelect}>
+			<TouchableOpacity onPress={() => this.onItemClick()}>
 				<View style={styles.cell_container}>
 					<Text style={styles.title}>{item.full_name}</Text>
 					<Text style={styles.description} numberOfLines={3}>
