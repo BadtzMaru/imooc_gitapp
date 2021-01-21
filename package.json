@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@react-native-community/async-storage": "^1.12.1",
+		"@react-native-community/clipboard": "^1.5.1",
 		"@react-native-community/masked-view": "^0.1.10",
 		"GitHubTrending": "^5.0.0",
 		"prop-types": "^15.7.2",
@@ -20,6 +21,7 @@
 		"react-native-event-bus": "^1.0.0",
 		"react-native-gesture-handler": "^1.9.0",
 		"react-native-htmlview": "^0.15.0",
+		"react-native-parallax-scroll-view": "^0.21.3",
 		"react-native-reanimated": "^1.13.2",
 		"react-native-safe-area-context": "^3.1.9",
 		"react-native-screens": "^2.16.1",

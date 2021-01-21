@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BaseItem from './BaseItem';
 
 class PopularItem extends BaseItem {
 	render() {
 		const { projectModel } = this.props;
 		const { item } = projectModel;
-		if (!item || !item.owner) return null;
+		if (!item || !item.owner) {
+			return null;
+		}
 
 		return (
 			<TouchableOpacity onPress={() => this.onItemClick()}>

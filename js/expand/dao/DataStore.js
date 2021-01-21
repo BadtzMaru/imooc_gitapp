@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { call } from 'react-native-reanimated';
 import Trending from 'GitHubTrending';
 
 export const FLAG_STORAGE = {
@@ -11,7 +10,9 @@ const AUTH_TOKEN = 'fd82d1e882462e23b8e88aa82198f166';
 
 export default class DataStore {
 	saveData(url, data, callback) {
-		if (!data || !url) return;
+		if (!data || !url) {
+			return;
+		}
 		AsyncStorage.setItem(url, JSON.stringify(this._wrapData(data)), callback);
 	}
 	_wrapData(data) {
@@ -100,9 +101,15 @@ export default class DataStore {
 		const currentDate = new Date();
 		const targetDate = new Date();
 		targetDate.setTime(timestamp);
-		if (currentDate.getMonth() !== targetDate.getMonth()) return false;
-		if (currentDate.getDate() !== targetDate.getDate()) return false;
-		if (currentDate.getHours() - targetDate.getHours() > 4) return false;
+		if (currentDate.getMonth() !== targetDate.getMonth()) {
+			return false;
+		}
+		if (currentDate.getDate() !== targetDate.getDate()) {
+			return false;
+		}
+		if (currentDate.getHours() - targetDate.getHours() > 4) {
+			return false;
+		}
 		return true;
 	}
 }

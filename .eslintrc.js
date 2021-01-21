@@ -7,5 +7,7 @@ module.exports = {
 		'react/no-string-refs': 0,
 		'no-shadow': 0,
 		'react-native/no-inline-styles': 0,
+		'no-mixed-spaces-and-tabs': 0,
+		curly: 0,
 	},
 };

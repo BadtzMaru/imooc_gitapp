@@ -16,7 +16,6 @@ import EventTypes from '../util/EventTypes';
 import EventBus from 'react-native-event-bus';
 
 const TITLE_COLOR = '#678';
-const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
 class FavoritePage extends Component {
 	constructor(props) {
@@ -112,7 +111,7 @@ class FavoriteTab extends Component {
 		onLoadFavoriteData(this.storeName, isShowLoading);
 	}
 	onFavorite(item, isFavorite) {
-		FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, this.storeName);
+		FavoriteUtil.onFavorite(this.favoriteDao, item, isFavorite, this.storeName);
 		if (this.storeName === FLAG_STORAGE.flag_popular) {
 			EventBus.getInstance().fireEvent(EventTypes.favorite_changed_popular);
 		} else {

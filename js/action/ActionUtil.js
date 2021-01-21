@@ -16,7 +16,7 @@ export function handleData(actionType, dispatch, storeName, data, pageSize, favo
 		dispatch({
 			type: actionType,
 			items: fixItems,
-			projectModels: projectModels,
+			projectModels,
 			storeName,
 			pageIndex: 1,
 		});
@@ -27,7 +27,9 @@ export async function _projectModels(showItems, favoriteDao, callback) {
 	let keys = [];
 	try {
 		keys = await favoriteDao.getFavoriteKeys();
-	} catch (e) {}
+	} catch (e) {
+		console.warn(e);
+	}
 	let projectModels = [];
 	for (let i = 0, len = showItems.length; i < len; i++) {
 		projectModels.push(new ProjectModel(showItems[i], Utils.checkFavorite(showItems[i], keys)));
