@@ -9,7 +9,6 @@ import BackPressComponent from '../common/BackPressComponent';
 import FavoriteDao from '../expand/dao/FavoriteDao';
 
 const TRENDING_URL = 'https://github.com/';
-const THEME_COLOR = '#678';
 
 class DetailPage extends Component {
 	constructor(props) {
@@ -71,6 +70,7 @@ class DetailPage extends Component {
 		this.setState({ canGoBack: navState.canGoBack, url: navState.url });
 	}
 	render() {
+		const { theme } = this.params;
 		const titleLayoutStyle = this.state.title.length > 20 ? { paddingRight: 30 } : null;
 		let navigationBar = (
 			<NavigationBar
@@ -78,7 +78,7 @@ class DetailPage extends Component {
 				titleLayoutStyle={titleLayoutStyle}
 				leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
 				rightButton={this.renderRightButton()}
-				style={{ backgroundColor: THEME_COLOR }}
+				style={theme.styles.navBar}
 			/>
 		);
 		return (

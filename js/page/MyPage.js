@@ -10,8 +10,6 @@ import ViewUtil from '../util/ViewUtil';
 import NavigationUtil from '../navigator/NavigationUtil';
 import { FLAG_LANGUAGE } from '../expand/dao/LanguageDao';
 
-const THEME_COLOR = '#678';
-
 class MyPage extends Component {
 	onClick(menu) {
 		let RouteName = '',
@@ -36,6 +34,11 @@ class MyPage extends Component {
 			case MORE_MENU.About_Author:
 				RouteName = 'AboutMePage';
 				break;
+			case MORE_MENU.Custom_Theme:
+				const { onShowCustomThemeView } = this.props;
+				console.log(onShowCustomThemeView);
+				onShowCustomThemeView(true);
+				break;
 			case MORE_MENU.Custom_Key:
 			case MORE_MENU.Custom_Language:
 			case MORE_MENU.Remove_Key:
@@ -49,24 +52,26 @@ class MyPage extends Component {
 		}
 	}
 	getItem(menu) {
-		return ViewUtil.getMenuItem(() => this.onClick(menu), menu, THEME_COLOR);
+		const { theme } = this.props;
+		return ViewUtil.getMenuItem(() => this.onClick(menu), menu, theme.themeColor);
 	}
 	render() {
+		const { theme } = this.props;
 		let statusBar = {
-			backgroundColor: THEME_COLOR,
+			backgroundColor: theme.themeColor,
 			barStyle: 'light-content',
 		};
-		let navigationBar = <NavigationBar title='我的' statusBar={statusBar} style={{ backgroundColor: THEME_COLOR }} />;
+		let navigationBar = <NavigationBar title='我的' statusBar={statusBar} style={{ backgroundColor: theme.styles.navBar.backgroundColor }} />;
 		return (
 			<View style={GlobalStyles.root_container}>
 				{navigationBar}
 				<ScrollView>
 					<TouchableOpacity onPress={() => this.onClick(MORE_MENU.About)} style={styles.item}>
 						<View style={styles.about_left}>
-							<Ionicons name={MORE_MENU.About.icon} size={40} style={{ marginRight: 10, color: THEME_COLOR }} />
+							<Ionicons name={MORE_MENU.About.icon} size={40} style={{ marginRight: 10, color: theme.themeColor }} />
 							<Text>GitHub Popular</Text>
 						</View>
-						<Ionicons name='chevron-forward' size={22} style={{ marginRight: 10, color: THEME_COLOR }} />
+						<Ionicons name='chevron-forward' size={22} style={{ marginRight: 10, color: theme.themeColor }} />
 					</TouchableOpacity>
 					<View style={GlobalStyles.line} />
 					{this.getItem(MORE_MENU.Tutorial)}
@@ -116,8 +121,11 @@ const styles = StyleSheet.create({
 	},
 });
 
+const mapStateToProps = (state) => ({
+	theme: state.theme.theme,
+});
 const mapDispatchToProps = (dispatch) => ({
-	onThemeChange: (theme) => dispatch(actions.onThemeChange(theme)),
+	onShowCustomThemeView: (show) => dispatch(actions.onShowCustomThemeView(show)),
 });
 
-export default connect(null, mapDispatchToProps)(MyPage);
+export default connect(mapStateToProps, mapDispatchToProps)(MyPage);

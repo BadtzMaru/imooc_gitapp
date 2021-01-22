@@ -28,11 +28,11 @@ class PopularPage extends Component {
 	}
 	_genTabs() {
 		const tabs = {};
-		const { keys } = this.props;
+		const { keys, theme } = this.props;
 		keys.forEach((item, index) => {
 			if (item.checked) {
 				tabs[`tab${index}`] = {
-					screen: (props) => <PopularTabPage {...this.props} tabLabel={item.name} />,
+					screen: (props) => <PopularTabPage {...this.props} tabLabel={item.name} theme={theme} />,
 					navigationOptions: {
 						title: item.name,
 					},
@@ -42,7 +42,7 @@ class PopularPage extends Component {
 		return tabs;
 	}
 	render() {
-		const { keys } = this.props;
+		const { keys, theme } = this.props;
 		let statusBar = {
 			backgroundColor: TITLE_COLOR,
 			barStyle: 'light-content',
@@ -52,7 +52,7 @@ class PopularPage extends Component {
 				title='最热'
 				statusBar={statusBar}
 				style={{
-					backgroundColor: TITLE_COLOR,
+					backgroundColor: theme.themeColor,
 				}}
 			/>
 		);
@@ -64,7 +64,7 @@ class PopularPage extends Component {
 							upperCaseLabel: false,
 							scrollEnabled: true,
 							style: {
-								backgroundColor: '#a67',
+								backgroundColor: theme.styles.navBar.backgroundColor,
 							},
 							indicatorStyle: styles.indicatorStyle,
 							labelStyle: styles.labelStyle,
@@ -83,6 +83,7 @@ class PopularPage extends Component {
 }
 const mapPopularStateToProps = (state) => ({
 	keys: state.language.keys,
+	theme: state.theme.theme,
 });
 const mapPopularDispatchToProps = (dispatch) => ({
 	onLoadLanguage: (flag) => dispatch(actions.onLoadLanguage(flag)),
@@ -151,12 +152,15 @@ class PopularTab extends Component {
 	}
 	renderItem(data) {
 		const { item } = data;
+		const { theme } = this.props;
 		return (
 			<PopularItem
+				theme={theme}
 				projectModel={item}
 				onSelect={(callback) => {
 					NavigationUtil.goPage(
 						{
+							theme,
 							projectModel: item,
 							flag: FLAG_STORAGE.flag_popular,
 							callback,
@@ -177,6 +181,7 @@ class PopularTab extends Component {
 		);
 	}
 	render() {
+		const { theme } = this.props;
 		let store = this._store();
 		return (
 			<View style={styles.container}>
@@ -187,13 +192,13 @@ class PopularTab extends Component {
 					refreshControl={
 						<RefreshControl
 							title='Loading'
-							titleColor={TITLE_COLOR}
-							colors={[TITLE_COLOR]}
+							titleColor={theme.themeColor}
+							colors={[theme.themeColor]}
 							refreshing={store.isLoading}
 							onRefresh={() => {
 								this.loadData();
 							}}
-							tintColor={TITLE_COLOR}
+							tintColor={theme.themeColor}
 						/>
 					}
 					ListFooterComponent={() => this.genIndicator()}
