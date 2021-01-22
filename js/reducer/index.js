@@ -4,8 +4,9 @@ import popular from './popular';
 import trending from './trending';
 import favorite from './favorite';
 import language from './language';
+import search from './search';
 
 // 合并 reducer
-const index = combineReducers({ theme, popular, trending, favorite, language });
+const index = combineReducers({ theme, popular, trending, favorite, language, search });
 
 export default index;

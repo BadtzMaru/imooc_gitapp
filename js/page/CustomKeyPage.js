@@ -111,7 +111,7 @@ class CustomKeyPage extends Component {
 				<View key={i}>
 					<View style={styles.item}>
 						{this.renderCheckoBox(dataArray[i], i)}
-						{i + 1 < len && this.renderCheckoBox(dataArray[i + 1], i + 1)}
+						{i + 1 < len ? this.renderCheckoBox(dataArray[i + 1], i + 1) : <View style={{ flex: 1 }} />}
 					</View>
 					<View style={styles.line} />
 				</View>
