@@ -16,7 +16,6 @@ import FavoriteUtil from '../util/FavoriteUtil';
 import EventBus from 'react-native-event-bus';
 import EventTypes from '../util/EventTypes';
 import { FLAG_LANGUAGE } from '../expand/dao/LanguageDao';
-import ArrayUtil from '../util/ArrayUtil';
 
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 
@@ -54,7 +53,11 @@ class TrendingPage extends Component {
 	renderTitleView() {
 		return (
 			<View>
-				<TouchableOpacity ref='button' onPress={() => this.dialog.show()}>
+				<TouchableOpacity
+					ref='button'
+					onPress={() => {
+						this.dialog.show();
+					}}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<Text style={{ fontSize: 18, color: '#FFF', fontWeight: '400' }}>趋势 {this.state.timeSpan.showText}</Text>
 						<MaterialIcons name='arrow-drop-down' size={22} style={{ color: 'white' }} />
@@ -85,6 +88,7 @@ class TrendingPage extends Component {
 						indicatorStyle: styles.indicatorStyle,
 						labelStyle: styles.labelStyle,
 					},
+					lazy: true,
 				})
 			);
 		}

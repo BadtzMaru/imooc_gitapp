@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import actions from '../action/index';
+import NavigationUtil from '../navigator/NavigationUtil';
 import NavigationBar from '../common/NavigationBar';
 import LanguageDao, { FLAG_LANGUAGE } from '../expand/dao/LanguageDao';
 import BackPressComponent from '../common/BackPressComponent';
 import ViewUtil from '../util/ViewUtil';
-import CheckBox from 'react-native-check-box';
+import CheckBox from '../components/react-native-check-box';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArrayUtil from '../util/ArrayUtil';
 
 const TITLE_COLOR = '#678';
 
@@ -22,6 +24,14 @@ class CustomKeyPage extends Component {
 		this.state = {
 			keys: [],
 		};
+	}
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (prevState.keys !== CustomKeyPage._keys(nextProps, null, prevState)) {
+			return {
+				keys: CustomKeyPage._keys(nextProps, null, prevState),
+			};
+		}
+		return null;
 	}
 	componentDidMount() {
 		this.backPress.componentDidMount();
@@ -39,6 +49,15 @@ class CustomKeyPage extends Component {
 		const { flag, isRemoveKey } = props.navigation.state.params;
 		let key = flag === FLAG_LANGUAGE.flag_key ? 'keys' : 'languages';
 		if (isRemoveKey && !original) {
+			return (
+				(state && state.keys && state.keys.length !== 0 && state.keys) ||
+				props.language[key].map((val) => {
+					return {
+						...val,
+						checked: false,
+					};
+				})
+			);
 		} else {
 			return props.language[key];
 		}
@@ -47,8 +66,41 @@ class CustomKeyPage extends Component {
 		this.onBack();
 		return true;
 	}
-	onBack() {}
-	onSave() {}
+	onBack() {
+		if (this.changeValues.length > 0) {
+			Alert.alert('提示', '要保存修改吗?', [
+				{
+					text: '否',
+					onPress: () => {
+						NavigationUtil.goBack(this.props.navigation);
+					},
+				},
+				{
+					text: '是',
+					onPress: () => {
+						this.onSave();
+					},
+				},
+			]);
+		} else {
+			NavigationUtil.goBack(this.props.navigation);
+		}
+	}
+	onSave() {
+		if (this.changeValues.length === 0) {
+			return NavigationUtil.goBack(this.props.navigation);
+		}
+		let keys;
+		if (this.isRemoveKey) {
+			for (let i = 0, l = this.changeValues.length; i < l; i++) {
+				ArrayUtil.remove((keys = CustomKeyPage._keys(this.props, true)), this.changeValues[i], 'name');
+			}
+		}
+		this.languageDao.save(keys || this.state.keys);
+		const { onLoadLanguage } = this.props;
+		onLoadLanguage(this.params.flag);
+		NavigationUtil.goBack(this.props.navigation);
+	}
 	renderView() {
 		let dataArray = this.state.keys;
 		if (!dataArray || dataArray.length === 0) return null;
@@ -60,13 +112,21 @@ class CustomKeyPage extends Component {
 					<View style={styles.item}>
 						{this.renderCheckoBox(dataArray[i], i)}
 						{i + 1 < len && this.renderCheckoBox(dataArray[i + 1], i + 1)}
-						<View style={styles.line} />
 					</View>
+					<View style={styles.line} />
 				</View>
 			);
 		}
+		return views;
 	}
-	onClick(data, index) {}
+	onClick(data, index) {
+		data.checked = !data.checked;
+		ArrayUtil.updateArray(this.changeValues, data);
+		this.state.keys[index] = data;
+		this.setState({
+			keys: this.state.keys,
+		});
+	}
 	_checkedImage(checked) {
 		return <Ionicons name={checked ? 'ios-checkbox' : 'md-square-outline'} size={20} style={{ color: TITLE_COLOR }} />;
 	}
@@ -75,7 +135,7 @@ class CustomKeyPage extends Component {
 			<CheckBox
 				style={{ flex: 1, padding: 10 }}
 				onClick={() => this.onClick(data, index)}
-				isChecked={data.isChecked}
+				isChecked={data.checked}
 				leftText={data.name}
 				checkedImage={this._checkedImage(true)}
 				unCheckedImage={this._checkedImage(false)}
@@ -93,6 +153,7 @@ class CustomKeyPage extends Component {
 					backgroundColor: TITLE_COLOR,
 				}}
 				rightButton={ViewUtil.getRightButton(rightButtonTitle, () => this.onSave())}
+				leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
 			/>
 		);
 		return (

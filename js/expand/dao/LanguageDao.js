@@ -22,7 +22,7 @@ export default class LanguageDao {
 					try {
 						resolve(JSON.parse(result));
 					} catch (e) {
-						reject(error);
+						reject(e);
 					}
 				}
 			});

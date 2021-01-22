@@ -26,6 +26,7 @@
 		"react-native-reanimated": "^1.13.2",
 		"react-native-safe-area-context": "^3.1.9",
 		"react-native-screens": "^2.16.1",
+		"react-native-sortable-listview": "^0.2.9",
 		"react-native-vector-icons": "^7.1.0",
 		"react-native-webview": "^11.0.3",
 		"react-navigation": "^4.4.3",
@@ -47,5 +48,8 @@
 	},
 	"jest": {
 		"preset": "react-native"
+	},
+	"resolutions": {
+		"deprecated-react-native-listview": "0.0.6"
 	}
 }
