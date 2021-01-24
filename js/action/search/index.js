@@ -2,6 +2,7 @@ import Types from '../types';
 import DataStore, { FLAG_STORAGE } from '../../expand/dao/DataStore';
 import { handleData, _projectModels, doCallBack } from '../ActionUtil';
 import ArrayUtil from '../../util/ArrayUtil';
+import Utils from '../../util/Utils';
 
 const API_URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
@@ -28,7 +29,7 @@ export function onSearch(inputKey, pageSize, token, favoriteDao, popularKeys, ca
 				}
 				let items = responseData.items;
 				handleData(Types.SEARCH_REFRESH_SUCCESS, dispatch, '', { data: items }, pageSize, favoriteDao, {
-					showBottomButton: !checkKeyIsExist(popularKeys, inputKey),
+					showBottomButton: !Utils.checkKeyIsExist(popularKeys, inputKey),
 					inputKey,
 				});
 			})
@@ -51,13 +52,6 @@ function hasCancel(token, isRemove) {
 	return false;
 }
 
-function checkKeyIsExist(keys, key) {
-	for (let i = 0, l = keys.length; i < l; i++) {
-		if (key.toLowerCase() === keys[i].name.toLowerCase()) return true;
-	}
-	return false;
-}
-
 export function onSearchCancel(token) {
 	return (dispatch) => {
 		CANCEL_TOKENS.push(token);
@@ -73,7 +67,7 @@ export function onLoadMoreSearch(pageIndex, pageSize, dataArray = [], favoriteDa
 					callBack('no more');
 				}
 				dispatch({
-					type: Types.POPULAR_LOAD_MORE_FAIL,
+					type: Types.SEARCH_LOAD_MORE_FAIL,
 					error: 'no more',
 					pageIndex: --pageIndex,
 				});
@@ -81,7 +75,7 @@ export function onLoadMoreSearch(pageIndex, pageSize, dataArray = [], favoriteDa
 				let max = pageSize * pageIndex > dataArray.length ? dataArray.length : pageSize * pageIndex;
 				_projectModels(dataArray.slice(0, max), favoriteDao, (data) => {
 					dispatch({
-						type: Types.POPULAR_LOAD_MORE_SUCCESS,
+						type: Types.SEARCH_LOAD_MORE_SUCCESS,
 						pageIndex,
 						projectModels: data,
 					});

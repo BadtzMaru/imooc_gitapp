@@ -17,6 +17,7 @@ export default function onAction(state = defaultState, action) {
 				isLoading: true,
 				hideLoadingMore: true,
 				showBottomButton: false,
+				showText: '取消',
 			};
 		case Types.SEARCH_REFRESH_SUCCESS: // 获取数据成功
 			return {

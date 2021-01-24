@@ -1,26 +1,19 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import actions from '../action/index';
-import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
-import { createAppContainer } from 'react-navigation';
 import NavigationUtil from '../navigator/NavigationUtil';
 import PopularItem from '../common/PopularItem';
 import Toast from 'react-native-easy-toast';
-import NavigationBar from '../common/NavigationBar';
 import FavoriteDao from '../expand/dao/FavoriteDao';
 import { FLAG_STORAGE } from '../expand/dao/DataStore';
 import FavoriteUtil from '../util/FavoriteUtil';
-import EventBus from 'react-native-event-bus';
-import EventTypes from '../util/EventTypes';
 import LanguageDao, { FLAG_LANGUAGE } from '../expand/dao/LanguageDao';
 import BackPressComponent from '../common/BackPressComponent';
 import GlobalStyles from '../res/styles/GlobalStyles';
 import ViewUtil from '../util/ViewUtil';
+import Utils from '../util/Utils';
 
-const URL = 'https://api.github.com/search/repositories?q=';
-const QUERY_STR = '&sort=stars';
-const TITLE_COLOR = '#678';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
 const pageSize = 10; // 设为常量
@@ -50,39 +43,25 @@ class SearchPage extends Component {
 		}
 		return true;
 	}
-
-	_store() {
-		const { popular } = this.props;
-		let store = popular[this.storeName];
-		if (!store) {
-			store = {
-				items: [],
-				isLoading: false,
-				peojectModes: [], // 要显示的数据
-				hideLoadingMore: true, // 默认隐藏加载更多
-			};
-		}
-		return store;
-	}
 	loadData(loadMore) {
 		const { onLoadMoreSearch, onSearch, search, keys } = this.props;
 		if (loadMore) {
-			onLoadMoreSearch(search.pageIndex, pageSize, search.items, this.favoriteDao, (calback) => {
-				this.refs.toast.show('没有更多了');
+			onLoadMoreSearch(++search.pageIndex, pageSize, search.items, this.favoriteDao, (calback) => {
+				this.toast.show('没有更多了');
 			});
 		} else {
 			onSearch(this.inputKey, pageSize, (this.searchToken = new Date().getTime()), this.favoriteDao, keys, (message) => {
-				this.refs.toast.show(message);
+				this.toast.show(message);
 			});
 		}
 	}
 	renderItem(data) {
 		const { item } = data;
-		const { theme } = this.props;
+		const { theme } = this.params;
 		return (
 			<PopularItem
-				theme={theme}
 				projectModel={item}
+				theme={theme}
 				onSelect={(callback) => {
 					NavigationUtil.goPage(
 						{
@@ -99,23 +78,69 @@ class SearchPage extends Component {
 		);
 	}
 	genIndicator() {
-		return this._store().hideLoadingMore ? null : (
+		const { search } = this.props;
+		return search.hideLoadingMore ? null : (
 			<View style={styles.indicatorContainer}>
 				<ActivityIndicator style={styles.indicator} color='#000' />
 				<Text>正在加载更多...</Text>
 			</View>
 		);
 	}
-	saveKey() {}
+	saveKey() {
+		const { keys } = this.props;
+		let key = this.inputKey;
+		if (Utils.checkKeyIsExist(keys, key)) {
+			this.toast.show(key + '已经存在');
+		} else {
+			key = { path: key, name: key, checked: true };
+			keys.unshift(key);
+			this.languageDao.save(keys);
+			this.toast.show(key.name + '保存成功');
+			this.isKeyChange = true;
+		}
+	}
+	onRightButtonClick() {
+		const { onSearchCancel, search } = this.props;
+		if (search.showText === '搜索') {
+			this.loadData();
+		} else {
+			onSearchCancel(this.searchToken);
+		}
+	}
 	renderNavBar() {
+		const { theme } = this.params;
 		const { showText, inputKey } = this.props.search;
 		const placeholder = inputKey || '请输入';
 		let backButton = ViewUtil.getLeftBackButton(() => this.onBackPress());
 		let inputView = <TextInput ref='input' placeholder={placeholder} onChangeText={(text) => (this.inputKey = text)} style={styles.textInput} />;
+		let rightButton = (
+			<TouchableOpacity
+				onPress={() => {
+					this.refs.input.blur();
+					this.onRightButtonClick();
+				}}>
+				<View style={{ marginRight: 10 }}>
+					<Text style={styles.title}>{showText}</Text>
+				</View>
+			</TouchableOpacity>
+		);
+		return (
+			<View
+				style={{
+					backgroundColor: theme.themeColor,
+					flexDirection: 'row',
+					alignItems: 'center',
+					height: Platform.OS === 'ios' ? GlobalStyles.nav_bar_height_ios : GlobalStyles.nav_bar_height_android,
+				}}>
+				{backButton}
+				{inputView}
+				{rightButton}
+			</View>
+		);
 	}
 	render() {
-		const { theme } = this.props;
-		const { isLoading, projectModels, showBottomButton, hideLoadingMore } = this.props.search;
+		const { theme } = this.params;
+		const { isLoading, projectModels, showBottomButton } = this.props.search;
 		let listView = !isLoading ? (
 			<FlatList
 				data={projectModels}
@@ -162,13 +187,14 @@ class SearchPage extends Component {
 		) : null;
 		let indicatorView = isLoading ? <ActivityIndicator style={styles.centering} color='#ccc' size='large' animating={isLoading} /> : null;
 		let resultView = (
-			<View>
+			<View style={{ flex: 1 }}>
 				{indicatorView}
 				{listView}
 			</View>
 		);
 		return (
 			<View style={styles.container}>
+				{this.renderNavBar()}
 				{resultView}
 				{bottomButton}
 				<Toast ref={(toast) => (this.toast = toast)} position='center' />
@@ -224,7 +250,7 @@ const styles = StyleSheet.create({
 		height: 40,
 		position: 'absolute',
 		left: 10,
-		top: GlobalStyles.window_height - 45,
+		top: GlobalStyles.window_height - 65,
 		right: 10,
 		borderRadius: 3,
 	},
@@ -232,5 +258,23 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		flex: 1,
+	},
+	textInput: {
+		flex: 1,
+		height: Platform.OS === 'ios' ? 26 : 36,
+		borderWidth: Platform.OS === 'ios' ? 1 : 0,
+		borderColor: 'white',
+		alignSelf: 'center',
+		paddingLeft: 5,
+		marginRight: 10,
+		marginLeft: 5,
+		borderRadius: 3,
+		opacity: 0.7,
+		color: 'white',
+	},
+	title: {
+		fontSize: 18,
+		color: 'white',
+		fontWeight: '500',
 	},
 });
